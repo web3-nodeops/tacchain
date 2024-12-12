@@ -1,0 +1,6 @@
+[submodule "contrib/block-explorer-big-dipper/callisto"]
+	path = contrib/block-explorer-big-dipper/callisto
+	url = git@github.com:forbole/callisto.git
+[submodule "contrib/block-explorer-big-dipper/big-dipper-2.0-cosmos"]
+	path = contrib/block-explorer-big-dipper/big-dipper-2.0-cosmos
+	url = git@github.com:Asphere-xyz/big-dipper-2.0-cosmos.git

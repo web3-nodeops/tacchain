@@ -1,0 +1,5 @@
+build
+coverage.txt
+*.log
+.DS_Store
+.testnet

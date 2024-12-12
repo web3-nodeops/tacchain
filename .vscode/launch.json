@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to running node",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "remotePath": "${workspaceFolder}",
+      "port": 26657,
+      "host": "127.0.0.1",
+      "showLog": true
+    },
+    {
+      "name": "Attach by Process ID",
+      "type": "go",
+      "request": "attach",
+      "mode": "local",
+      "processId": "${command:pickProcess}",
+      "showLog": true
+    },
+    {
+      "name": "Debug init cmd",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/tacchaind",
+      "args": [
+        "init",
+        "test",
+        "--chain-id",
+        "tacchain_2390-1",
+        "--default-denom",
+        "atom"
+      ],
+    },
+    {
+      "name": "Debug start cmd",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/tacchaind",
+      "args": [
+        "start",
+        "--chain-id",
+        "tacchain_2390-1",
+      ],
+    },
+  ],
+}

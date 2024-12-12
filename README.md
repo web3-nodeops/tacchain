@@ -1,0 +1,47 @@
+# Tac Chain
+
+`tacchaind` is a Cosmos SDK appchain with EVM and Wasm support.
+
+### Quickstart
+
+- Prerequisites
+  - [Go >= v1.21](https://go.dev/doc/install)
+
+```sh
+git clone git@github.com:Asphere-xyz/tacchain.git
+cd tacchain
+make install # install the tacchaind binary
+make localnet-init # initialize local chain
+make localnet-start # start the chain
+```
+
+- Network RPC can be accessed at <http://0.0.0.0:26657>
+
+- NOTE: `make install` will build the project and install the app binary to `$GOPATH/bin/tacchaind`. You can verify the installation using `tacchaind --help`.
+
+- NOTE: `make localnet-init` initializes a new chain and generates network config folder at `$HOME/.tacchaind`. The generated folder is used to persist the network state. It's important to backup this folder accordingly. Note that this command removes any existing `$HOME/.tacchaind`! Only use it if you want to start a local network for the first time or you want to reset your chain's state!
+
+### Join a public TAC Network
+
+Learn more: [NETWORKS.md](NETWORKS.md#join-a-network)
+
+### Using Docker
+
+```sh
+docker build . -t tacchaind:latest # build image
+docker run --rm -it tacchaind:latest tacchaind --help # example binary usage
+```
+
+### Block Explorer
+
+- Prerequisites:
+  - Docker
+
+A guide for setting up a [BigDipper](https://bigdipper.live/) Block Explorer can be found at [./contrib/block-explorer-big-dipper](./contrib/block-explorer-big-dipper/README.md)
+
+### Learn more
+
+- [Cosmos SDK docs](https://docs.cosmos.network)
+- [CosmWasm docs](https://docs.cosmwasm.com/)
+- [Ethermint docs](https://docs.ethermint.io/)
+
