@@ -9,6 +9,7 @@ import (
 
 	simappparams "cosmossdk.io/simapp/params"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/gogoproto/proto"
 	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
@@ -116,6 +117,8 @@ func MakeEncodingConfig() simappparams.EncodingConfig {
 
 	ethermintcodec.RegisterLegacyAminoCodec(legacyAmino)
 	ethermintcodec.RegisterInterfaces(interfaceRegistry)
+
+	legacytx.RegressionTestingAminoCodec = legacyAmino
 
 	eip712.SetEncodingConfig(encodingConfig)
 
