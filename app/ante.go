@@ -17,11 +17,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	ethermintante "github.com/evmos/ethermint/app/ante"
+	etherminttypes "github.com/evmos/ethermint/types"
 	evmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
@@ -186,27 +188,26 @@ func newLegacyCosmosAnteHandlerEip712(options HandlerOptions) (sdk.AnteHandler, 
 		return nil, errors.New("account keeper does not implement evmtypes.AccountKeeper")
 	}
 
-	return sdk.ChainAnteDecorators(
-		ethermintante.RejectMessagesDecorator{}, // reject MsgEthereumTxs
-		// disable the Msg types that cannot be included on an authz.MsgExec msgs field
-		ethermintante.NewAuthzLimiterDecorator(options.DisabledAuthzMsgs),
-		authante.NewSetUpContextDecorator(),
-		circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
-		authante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
-		authante.NewValidateBasicDecorator(),
-		authante.NewTxTimeoutHeightDecorator(),
-		ethermintante.NewMinGasPriceDecorator(options.FeeMarketKeeper, options.EvmKeeper),
-		authante.NewValidateMemoDecorator(options.AccountKeeper),
-		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		authante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
-		// SetPubKeyDecorator must be called before all signature verification decorators
-		authante.NewSetPubKeyDecorator(options.AccountKeeper),
-		authante.NewValidateSigCountDecorator(options.AccountKeeper),
-		authante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-		// Note: signature verification uses EIP instead of the cosmos signature validator
-		ethermintante.NewLegacyEip712SigVerificationDecorator(evmAccountKeeper, options.SignModeHandler),
-		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
-		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-		ethermintante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
-	), nil
+	ethermintOptions := ethermintante.HandlerOptions{
+		AccountKeeper:          evmAccountKeeper,
+		BankKeeper:             options.BankKeeper.(bankkeeper.BaseKeeper),
+		SignModeHandler:        options.SignModeHandler,
+		FeegrantKeeper:         options.HandlerOptions.FeegrantKeeper,
+		SigGasConsumer:         ethermintante.DefaultSigVerificationGasConsumer,
+		IBCKeeper:              options.IBCKeeper,
+		EvmKeeper:              options.EvmKeeper,
+		FeeMarketKeeper:        options.FeeMarketKeeper,
+		MaxTxGasWanted:         options.MaxTxGasWanted,
+		ExtensionOptionChecker: etherminttypes.HasDynamicFeeExtensionOption,
+		TxFeeChecker:           ethermintante.NewDynamicFeeChecker(options.EvmKeeper),
+		DisabledAuthzMsgs: []string{
+			sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
+			sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
+			sdk.MsgTypeURL(&vestingtypes.MsgCreatePermanentLockedAccount{}),
+			sdk.MsgTypeURL(&vestingtypes.MsgCreatePeriodicVestingAccount{}),
+		},
+	}
+
+	// Deprecated: Handle as normal Cosmos SDK tx, except signature is checked for Legacy EIP712 representation
+	return ethermintante.NewLegacyCosmosAnteHandlerEip712(ethermintOptions), nil
 }
