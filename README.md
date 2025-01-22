@@ -1,6 +1,6 @@
 # Tac Chain
 
-`tacchaind` is a Cosmos SDK appchain with EVM and Wasm support.
+`tacchaind` is a TAC EVM Node based on CosmosSDK with EVM and Wasm support.
 
 ### Quickstart
 
@@ -8,7 +8,7 @@
   - [Go >= v1.21](https://go.dev/doc/install)
 
 ```sh
-git clone git@github.com:Asphere-xyz/tacchain.git
+git clone https://github.com/TacBuild/tacchain.git
 cd tacchain
 make install # install the tacchaind binary
 make localnet-init # initialize local chain
