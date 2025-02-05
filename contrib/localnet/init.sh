@@ -24,6 +24,10 @@ sed -i.bak "s/\"no_base_fee\": false/\"no_base_fee\": true/g" $HOME/.tacchaind/c
 sed -i.bak "s/\"max_gas\": \"-1\"/\"max_gas\": \"20000000\"/g" $HOME/.tacchaind/config/genesis.json
 # enable evm eip-3855
 sed -i.bak "s/\"extra_eips\": \[\]/\"extra_eips\": \[\"3855\"\]/g" $HOME/.tacchaind/config/genesis.json
+# disable EIP-155
+sed -i.bak "s/\"allow_unprotected_txs\": false/\"allow_unprotected_txs\": true/g" $HOME/.tacchaind/config/genesis.json
+sed -i.bak "s/allow-unprotected-txs = false/\allow-unprotected-txs = true/g" $HOME/.tacchaind/config/app.toml
+
 
 # setup and add validator to genesis
 $TACCHAIND keys add validator

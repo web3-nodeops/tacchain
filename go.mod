@@ -259,7 +259,9 @@ replace (
 
 	// use ethermint fork compatible with cosmos-sdk v0.50.x
 	// See: https://github.com/evmos/ethermint/compare/v0.22.0...b-harvest:ethermint:v0.22.0-sdk50-1
-	github.com/evmos/ethermint => github.com/b-harvest/ethermint v0.22.0-sdk50-1
+	// NOTE (03-Feb-2025): Replacing dependency with Asphere-xyz fork including fix for 'allow-unprotected-txs'
+	// See: https://github.com/b-harvest/ethermint/compare/v0.22.0-sdk50-1...Asphere-xyz:ethermint:fix/allow-unprotected-txs-config?expand=1
+	github.com/evmos/ethermint => github.com/Asphere-xyz/ethermint v0.0.0-20250203092701-fd0cf5c6ba98
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/10409
