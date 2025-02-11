@@ -257,11 +257,16 @@ replace (
 	// See: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
 
+	// NOTE(11-Feb-2025): Replacing with asphere-xyz fork to add support for MCOPY opcode
+	// See: https://github.com/ethereum/go-ethereum/compare/v1.10.26...Asphere-xyz:go-ethereum:v1.10.26-asphere
+	github.com/ethereum/go-ethereum => github.com/asphere-xyz/go-ethereum v0.0.0-20250211132152-1883aefd0b72
+
 	// use ethermint fork compatible with cosmos-sdk v0.50.x
 	// See: https://github.com/evmos/ethermint/compare/v0.22.0...b-harvest:ethermint:v0.22.0-sdk50-1
 	// NOTE (03-Feb-2025): Replacing dependency with Asphere-xyz fork including fix for 'allow-unprotected-txs'
-	// See: https://github.com/b-harvest/ethermint/compare/v0.22.0-sdk50-1...Asphere-xyz:ethermint:fix/allow-unprotected-txs-config?expand=1
-	github.com/evmos/ethermint => github.com/Asphere-xyz/ethermint v0.0.0-20250203092701-fd0cf5c6ba98
+	// NOTE: (11-Feb-2025): Bumping to version that replaces go-ethereum dependency to add MCOPY support
+	// See: https://github.com/b-harvest/ethermint/compare/v0.22.0-sdk50-1...Asphere-xyz:ethermint:v0.22.0-sdk50-1-asphere
+	github.com/evmos/ethermint => github.com/asphere-xyz/ethermint v0.22.0-sdk50-1.0.20250211133355-878f0e5ac4a6
 
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// See: https://github.com/cosmos/cosmos-sdk/issues/10409
