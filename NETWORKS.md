@@ -18,10 +18,9 @@
 | EVM Explorer                | <https://explorer.tac-turin.ankr.com>                                                         |
 | Cosmos Explorer             | <https://explorer.tacchain-turin.ankr.com/tac>                                                |
 | Timeout commit (block time) | 3s                                                                                            |
-| Peer 1                      | 9b4995a048f930776ee5b799f201e9b00727ffcc@107.6.94.246:45120                                   |
-| Peer 2                      | e3c2479a6f418841bd64bae6dff027ea3efc1987@72.251.230.233:45120                                 |
-| Peer 3                      | fbf04b3d67705ed48831aa80ebe733775e672d1a@107.6.94.246:45110                                   |
-| Peer 4                      | 5a6f0e342ea66cb769194c81141ffbff7417fbcd@72.251.230.233:45110                                 |
+| Peer 1                      | f8124878e3526a9814c0a5f865820c5ea7eb26f8@72.251.230.233:45130                                 |
+| Peer 2                      | 4a03d6622a2ad923d79e81951fe651a17faf0be8@107.6.94.246:45130                                   |
+| Peer 3                      | ea5719fe6587b18ed0fee81f960e23c65c0e0ccc@206.217.210.164:45130                                |
 | Snapshots                   | TBD                                                                                           |
 | Frontend                    | TBD                                                                                           |
 
@@ -53,7 +52,7 @@ tacchaind init testnode --chain-id tacchain_2390-1 --home .testnet
 ..
 timeout_commit = "3s"
 ..
-persistent_peers = "9b4995a048f930776ee5b799f201e9b00727ffcc@107.6.94.246:45120,e3c2479a6f418841bd64bae6dff027ea3efc1987@72.251.230.233:45120,fbf04b3d67705ed48831aa80ebe733775e672d1a@107.6.94.246:45110,5a6f0e342ea66cb769194c81141ffbff7417fbcd@72.251.230.233:45110"
+persistent_peers = "f8124878e3526a9814c0a5f865820c5ea7eb26f8@72.251.230.233:45130,4a03d6622a2ad923d79e81951fe651a17faf0be8@107.6.94.246:45130,ea5719fe6587b18ed0fee81f960e23c65c0e0ccc@206.217.210.164:45130"
 ..
 ```
 
