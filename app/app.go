@@ -1113,12 +1113,13 @@ func (app *TacChainApp) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock
 
 // BeginBlocker application updates every begin block
 func (app *TacChainApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
-	if app.ChainID() == DefaultChainID && app.LastBlockHeight() == 3192450 {
-		// fix for tacchain_2390-1 chain halt at height 3192450
+	// fix for tacchain_2390-1 chain halt at height 3192450
+	if app.ChainID() == DefaultChainID && app.LastBlockHeight() == 3192449 {
 		if err := app.fixValidatorsState(ctx); err != nil {
 			panic(fmt.Sprintf("failed to fix validators state: %s", err))
 		}
 	}
+
 	return app.ModuleManager.BeginBlock(ctx)
 }
 
