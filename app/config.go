@@ -5,6 +5,7 @@
 package app
 
 import (
+	"math/big"
 	"os"
 
 	simappparams "cosmossdk.io/simapp/params"
@@ -53,6 +54,9 @@ var (
 	Bech32PrefixConsPub = Bech32PrefixAccAddr + "valconspub"
 
 	DefaultNodeHome = os.ExpandEnv("$HOME/") + NodeDir
+
+	// PowerReduction defines the default power reduction value for staking
+	PowerReduction = sdkmath.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(BaseDenomUnit), nil))
 )
 
 func init() {
@@ -63,6 +67,7 @@ func init() {
 // RegisterDenoms registers token denoms.
 func RegisterDenoms() {
 	sdk.DefaultBondDenom = BaseDenom
+	sdk.DefaultPowerReduction = PowerReduction
 
 	config := sdk.GetConfig()
 	ethermintcmdcfg.SetBip44CoinType(config)

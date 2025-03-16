@@ -5,6 +5,7 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -1006,6 +1007,56 @@ func NewTacChainApp(
 	return app
 }
 
+// fix for tacchain_2390-1 chain halt at height 3192450
+func (app *TacChainApp) fixValidatorsState(ctx sdk.Context) error {
+	validators, err := app.StakingKeeper.GetAllValidators(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get all validators: %s", err)
+	}
+
+	for _, validator := range validators {
+		store := ctx.KVStore(app.GetKey(stakingtypes.StoreKey))
+
+		deleted := false
+
+		iterator := storetypes.KVStorePrefixIterator(store, stakingtypes.ValidatorsByPowerIndexKey)
+		defer iterator.Close()
+
+		for ; iterator.Valid(); iterator.Next() {
+			valAddr := stakingtypes.ParseValidatorPowerRankKey(iterator.Key())
+			val := sdk.ValAddress(valAddr).String()
+
+			// get operator addr
+			var operator sdk.ValAddress = nil
+			if validator.OperatorAddress != "" {
+				addr, err := sdk.ValAddressFromBech32(validator.OperatorAddress)
+				if err != nil {
+					return fmt.Errorf("failed to parse operator address: %s", err)
+				}
+				operator = addr
+			}
+
+			if bytes.Equal(valAddr, operator) {
+				if deleted {
+					fmt.Println("Duplicate validator address is: " + val)
+				} else {
+					deleted = true
+				}
+				store.Delete(iterator.Key())
+			}
+		}
+
+		if err := app.StakingKeeper.SetValidatorByPowerIndex(ctx, validator); err != nil {
+			return fmt.Errorf("failed to set validator by power index: %s", err)
+		}
+		if _, err := app.StakingKeeper.ApplyAndReturnValidatorSetUpdates(ctx); err != nil {
+			return fmt.Errorf("failed to apply and return validator set updates: %s", err)
+		}
+	}
+
+	return nil
+}
+
 func (app *TacChainApp) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wasmConfig wasmtypes.WasmConfig, txCounterStoreKey *storetypes.KVStoreKey) {
 	anteHandler, err := NewAnteHandler(HandlerOptions{
 		HandlerOptions: authante.HandlerOptions{
@@ -1062,6 +1113,13 @@ func (app *TacChainApp) PreBlocker(ctx sdk.Context, _ *abci.RequestFinalizeBlock
 
 // BeginBlocker application updates every begin block
 func (app *TacChainApp) BeginBlocker(ctx sdk.Context) (sdk.BeginBlock, error) {
+	// fix for tacchain_2390-1 chain halt at height 3192450
+	if app.ChainID() == DefaultChainID && app.LastBlockHeight() == 3192449 {
+		if err := app.fixValidatorsState(ctx); err != nil {
+			panic(fmt.Sprintf("failed to fix validators state: %s", err))
+		}
+	}
+
 	return app.ModuleManager.BeginBlock(ctx)
 }
 
