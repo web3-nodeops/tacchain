@@ -88,7 +88,7 @@ We will repeat the same procedure and we need to stop our node once again at spe
 tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height 3192448
 ```
 
-### 6. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.5)
+### 8. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.5)
 
 In `v0.0.5` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
 
@@ -97,7 +97,7 @@ git checkout v0.0.5
 make install
 ```
 
-### 7. Start node
+### 9. Start node
 
 Once your node has stopped at specified height, we need to update our binary. As of 18-Mar-2025 `v0.0.5` is the last version of `tacchaind`. Once we update the binary after block height `3192448`, we will be able to get to the last height, so this time we will start the node without `--halt-height` flag.
 
