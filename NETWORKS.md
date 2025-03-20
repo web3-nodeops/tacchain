@@ -160,7 +160,7 @@ To setup your sentry node architecture you can follow the instructions below:
 - NOTE: This will initialize config folder in $HOME/.tacchaind
 
 - NOTE: Make sure you have replaced your genesis file with the one for Tac Turin Testnet. Example script to download it:
-`curl https://newyork-inap-72-251-230-233.ankr.com/tac_tacd_testnet_full_tendermint_rpc_1/genesis | jq '.result.genesis' > ./config/genesis.json` 
+`curl https://raw.githubusercontent.com/TacBuild/tacchain/refs/heads/main/networks/tacchain_2390-1/genesis.json > .testnet/config/genesis.json` 
 
 ### 2. Update `config.toml` for sentry node
 
