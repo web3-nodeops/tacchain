@@ -24,7 +24,7 @@
 | Snapshots                   | TBD                                                                                           |
 | Frontend                    | TBD                                                                                           |
 
-## Join a network
+## Join Tac Turin Testnet
 
 This example guide connects to testnet. You can replace `chain-id`, `persistent_peers`, `timeout_commit`, `genesis url` with the network you want to join. `--home` flag specifies the path to be used. The example will create [.testnet](.testnet) folder.
 
@@ -34,9 +34,10 @@ This example guide connects to testnet. You can replace `chain-id`, `persistent_
   - jq
   - curl
 
-### 1. Install `tacchaind`
+### 1. Install `tacchaind` [v0.0.1](https://github.com/TacBuild/tacchain/tree/v0.0.1)
 
-``` sh
+``` shell
+git checkout v0.0.1
 make install
 ```
 
@@ -52,25 +53,61 @@ tacchaind init testnode --chain-id tacchain_2390-1 --home .testnet
 ..
 timeout_commit = "3s"
 ..
-persistent_peers = "f8124878e3526a9814c0a5f865820c5ea7eb26f8@72.251.230.233:45130,4a03d6622a2ad923d79e81951fe651a17faf0be8@107.6.94.246:45130,ea5719fe6587b18ed0fee81f960e23c65c0e0ccc@206.217.210.164:45130"
+persistent_peers = "9b4995a048f930776ee5b799f201e9b00727ffcc@107.6.94.246:45120,e3c2479a6f418841bd64bae6dff027ea3efc1987@72.251.230.233:45120,fbf04b3d67705ed48831aa80ebe733775e672d1a@107.6.94.246:45110,5a6f0e342ea66cb769194c81141ffbff7417fbcd@72.251.230.233:45110"
 ..
 ```
 
 ### 4. Fetch genesis
 
 ``` sh
-curl https://newyork-inap-72-251-230-233.ankr.com/tac_tacd_testnet_full_tendermint_rpc_1/genesis | jq '.result.genesis' > .testnet/config/genesis.json
+curl https://raw.githubusercontent.com/TacBuild/tacchain/refs/heads/main/networks/tacchain_2390-1/genesis.json > .testnet/config/genesis.json
 ```
 
-### 5. Start node
+### 5. Start node with `--halt-height` flag.
 
-``` sh
+`--halt-height` flag which will automatically stop your node at specified block height - we want to run `v0.0.1` until block height `TODO`, then we will update our binary before we proceed.
+
+``` shell
+tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height TODO
+```
+
+### 6. Update binary to [v0.0.4](https://github.com/TacBuild/tacchain/tree/v0.0.4)
+
+Once your node has stopped at specified height, we need to update our binary. This is required because it has breaking changes, which would break our state if run before that point. In this case we introduced support for `mcopy` in `v0.0.4` and transactions including it that were executed before this version were recorded on chain with fail result.
+
+``` shell
+git checkout v0.0.4
+make install
+```
+
+### 7. Start node with `--halt-height` flag.
+
+We will repeat the same procedure and we need to stop our node once again at specified block, then update our binary.
+
+``` shell
+tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height TODO2
+```
+
+### 6. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.5)
+
+In `v0.0.5` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
+
+``` shell
+git checkout v0.0.4
+make install
+```
+
+### 7. Start node
+
+Once your node has stopped at specified height, we need to update our binary. As of 18-Mar-2025 `v0.0.5` is the last version of `tacchaind`. Once we update the binary after block height TODO2, we will be able to get to the last height, so this time we will start the node without `--halt-height` flag.
+
+``` shell
 tacchaind start --chain-id tacchain_2390-1 --home .testnet
 ```
 
 ## Join as a validator
 
-### 1. Make sure you followed [Join a network](#join-a-network) guide and you have a fully synced node to the latest block.
+### 1. Make sure you followed [Join Tac Turin Testnet](#join-tac-turin-testnet) guide and you have a fully synced node to the latest block.
 
 ### 2. Fund account and import key
 
