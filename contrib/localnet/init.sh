@@ -31,6 +31,6 @@ sed -i.bak "s/allow-unprotected-txs = false/\allow-unprotected-txs = true/g" $HO
 
 # setup and add validator to genesis
 $TACCHAIND keys add validator
-$TACCHAIND genesis add-genesis-account validator 100000000000000000000000000$DENOM --keyring-backend $KEYRING_BACKEND
-$TACCHAIND genesis gentx validator 1000000$DENOM --chain-id $CHAIN_ID
+$TACCHAIND genesis add-genesis-account validator 1000000000000000000000000000000$DENOM --keyring-backend $KEYRING_BACKEND
+$TACCHAIND genesis gentx validator 10000000000000000000000000000$DENOM --chain-id $CHAIN_ID
 $TACCHAIND genesis collect-gentxs
