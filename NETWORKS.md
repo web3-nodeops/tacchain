@@ -116,7 +116,22 @@ make install
 
 ### 11. Start node
 
-Once your node has stopped at specified height, we need to update our binary. As of 18-Mar-2025 `v0.0.5` is the last version of `tacchaind`. Once we update the binary after block height `3192449`, we will be able to get to the last height, so this time we will start the node without `--halt-height` flag.
+This time we are not going to use `--halt-height` flag, instead we'll wait for our node to hit height `3408172`, at which we applied our next upgrade - `v0.0.6-testnet`. At the specified height, you should see a consensus error stating that you need to upgrade your binary version.
+
+``` shell
+tacchaind start --chain-id tacchain_2390-1 --home .testnet
+```
+
+### 12. Upgrade binary to [v0.0.6-testnet](https://github.com/TacBuild/tacchain/tree/v0.0.6-testnet)
+
+Once you get the error we mentioned above, you can stop your node and proceed with next update. In this version bumped GETH to v1.13.15.
+
+``` shell
+git checkout v0.0.6-testnet
+make install
+```
+
+### 13. Start node
 
 ``` shell
 tacchaind start --chain-id tacchain_2390-1 --home .testnet
