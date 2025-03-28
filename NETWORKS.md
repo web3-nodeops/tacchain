@@ -43,6 +43,8 @@ make install
 
 ### 2. Initialize network folder
 
+In this example our node moniker will be `testnode`, don't forget to name your own node differently.
+
 ``` sh
 tacchaind init testnode --chain-id tacchain_2390-1 --home .testnet
 ```
@@ -157,6 +159,8 @@ tacchaind --home .testnet keys unsafe-import-eth-key validator <PRIVATE_KEY> --k
 
 1. Generate tx json file
 
+In this example our moniker is `testnode` as named when we initialized our node. Don't forget to replace with your node moniker.
+
 ``` sh
 echo "{\"pubkey\":$(tacchaind --home .testnet tendermint show-validator),\"amount\":\"1000000000utac\",\"moniker\":\"testnode\",\"identity\":null,\"website\":null,\"security\":null,\"details\":null,\"commission-rate\":\"0.1\",\"commission-max-rate\":\"0.2\",\"commission-max-change-rate\":\"0.01\",\"min-self-delegation\":\"1\"}" > validatortx.json
 ```
@@ -168,6 +172,8 @@ tacchaind --home .testnet tx staking create-validator validatortx.json --from va
 ```
 
 ### 4. Delegate more tokens (optional)
+
+In this example our moniker is `testnode` as named when we initialized our node. Don't forget to replace with your node moniker.
 
 ``` sh
 tacchaind --home .testnet tx staking delegate $(tacchaind --home .testnet q staking validators --output json | jq -r '.validators[] | select(.description.moniker == "testnode") | .operator_address') 1000000000utac --keyring-backend test --from validator -y
