@@ -14,7 +14,8 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+
+	// "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server"
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,8 +27,8 @@ import (
 	"github.com/Asphere-xyz/tacchain/app"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
-	etherminthd "github.com/evmos/ethermint/crypto/hd"
-	ethermintserverflags "github.com/evmos/ethermint/server/flags"
+	// etherminthd "github.com/evmos/ethermint/crypto/hd"
+	// ethermintserverflags "github.com/evmos/ethermint/server/flags"
 
 	rosettaCmd "github.com/cosmos/rosetta/cmd"
 )
@@ -38,13 +39,18 @@ func NewRootCmd() *cobra.Command {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
+	temp := tempDir()
+	// cleanup temp dir after we are done with the tempApp, so we don't leave behind a
+	// new temporary directory for every invocation. See https://github.com/CosmWasm/wasmd/issues/2017
+	defer os.RemoveAll(temp)
+
 	tempApp := app.NewTacChainApp(
 		log.NewNopLogger(),
 		dbm.NewMemDB(),
 		nil,
 		true,
 		0,
-		simtestutil.NewAppOptionsWithFlagHome(tempDir()),
+		simtestutil.NewAppOptionsWithFlagHome(temp),
 		[]wasmkeeper.Option{},
 	)
 
@@ -63,7 +69,7 @@ func NewRootCmd() *cobra.Command {
 		WithInput(os.Stdin).
 		WithAccountRetriever(authtypes.AccountRetriever{}).
 		WithHomeDir(app.DefaultNodeHome).
-		WithKeyringOptions(etherminthd.EthSecp256k1Option()).
+		// WithKeyringOptions(etherminthd.EthSecp256k1Option()).
 		WithViper(app.AppName)
 
 	rootCmd := &cobra.Command{
@@ -122,17 +128,17 @@ func NewRootCmd() *cobra.Command {
 	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()
 	initClientCtx, _ = config.ReadDefaultValuesFromDefaultClientConfig(initClientCtx)
-	autoCliOpts.Keyring, _ = keyring.NewAutoCLIKeyring(initClientCtx.Keyring)
+	// autoCliOpts.Keyring, _ = keyring.NewAutoCLIKeyring(initClientCtx.Keyring)
 	autoCliOpts.ClientCtx = initClientCtx
 
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
 	}
 
-	rootCmd, err := ethermintserverflags.AddTxFlags(rootCmd)
-	if err != nil {
-		panic(err)
-	}
+	// rootCmd, err := ethermintserverflags.AddTxFlags(rootCmd)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	rootCmd.AddCommand(rosettaCmd.RosettaCommand(encodingConfig.InterfaceRegistry, encodingConfig.Codec))
 

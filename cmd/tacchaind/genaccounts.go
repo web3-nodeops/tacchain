@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	ethermintgethcommon "github.com/ethereum/go-ethereum/common"
+	// ethermintgethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -21,10 +21,9 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-
-	etherminthd "github.com/evmos/ethermint/crypto/hd"
-	etherminttypes "github.com/evmos/ethermint/types"
-	ethermintevmtypes "github.com/evmos/ethermint/x/evm/types"
+	// etherminthd "github.com/evmos/ethermint/crypto/hd"
+	// etherminttypes "github.com/evmos/ethermint/types"
+	// ethermintevmtypes "github.com/evmos/ethermint/x/evm/types"
 )
 
 const (
@@ -45,7 +44,8 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 `,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd).WithKeyringOptions(etherminthd.EthSecp256k1Option())
+			// clientCtx := client.GetClientContextFromCmd(cmd).WithKeyringOptions(etherminthd.EthSecp256k1Option())
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			clientCtx, err := client.ReadPersistentCommandFlags(clientCtx, cmd.Flags())
 			if err != nil {
 				return err
@@ -118,10 +118,10 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 					return errors.New("invalid vesting parameters; must supply start and end time or end time")
 				}
 			} else {
-				genAccount = &etherminttypes.EthAccount{
-					BaseAccount: baseAccount,
-					CodeHash:    ethermintgethcommon.BytesToHash(ethermintevmtypes.EmptyCodeHash).Hex(),
-				}
+				// genAccount = &etherminttypes.EthAccount{
+				// 	BaseAccount: baseAccount,
+				// 	CodeHash:    ethermintgethcommon.BytesToHash(ethermintevmtypes.EmptyCodeHash).Hex(),
+				// }
 			}
 
 			if err := genAccount.Validate(); err != nil {

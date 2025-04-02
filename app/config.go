@@ -13,12 +13,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	"github.com/cosmos/gogoproto/proto"
-	evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
-	ethermintcmdcfg "github.com/evmos/ethermint/cmd/config"
-	ethermintcodec "github.com/evmos/ethermint/encoding/codec"
-	"github.com/evmos/ethermint/ethereum/eip712"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	protov2 "google.golang.org/protobuf/proto"
+	// evmv1 "github.com/evmos/ethermint/api/ethermint/evm/v1"
+	// ethermintcmdcfg "github.com/evmos/ethermint/cmd/config"
+	// ethermintcodec "github.com/evmos/ethermint/encoding/codec"
+	// "github.com/evmos/ethermint/ethereum/eip712"
+	// evmtypes "github.com/evmos/ethermint/x/evm/types"
+	// protov2 "google.golang.org/protobuf/proto"
 
 	sdkmath "cosmossdk.io/math"
 	"cosmossdk.io/x/tx/signing"
@@ -69,8 +69,8 @@ func RegisterDenoms() {
 	sdk.DefaultBondDenom = BaseDenom
 	sdk.DefaultPowerReduction = PowerReduction
 
-	config := sdk.GetConfig()
-	ethermintcmdcfg.SetBip44CoinType(config)
+	// config := sdk.GetConfig()
+	// ethermintcmdcfg.SetBip44CoinType(config)
 
 	if err := sdk.RegisterDenom(DisplayDenom, sdkmath.LegacyOneDec()); err != nil {
 		panic(err)
@@ -101,7 +101,7 @@ func MakeEncodingConfig() simappparams.EncodingConfig {
 	}
 
 	// evm/MsgEthereumTx
-	signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
+	// signingOptions.DefineCustomGetSigners(protov2.MessageName(&evmv1.MsgEthereumTx{}), evmtypes.GetSignersFromMsgEthereumTxV2)
 
 	interfaceRegistry, err := codectypes.NewInterfaceRegistryWithOptions(codectypes.InterfaceRegistryOptions{
 		ProtoFiles:     proto.HybridResolver,
@@ -120,12 +120,12 @@ func MakeEncodingConfig() simappparams.EncodingConfig {
 		Amino:             legacyAmino,
 	}
 
-	ethermintcodec.RegisterLegacyAminoCodec(legacyAmino)
-	ethermintcodec.RegisterInterfaces(interfaceRegistry)
+	// ethermintcodec.RegisterLegacyAminoCodec(legacyAmino)
+	// ethermintcodec.RegisterInterfaces(interfaceRegistry)
 
 	legacytx.RegressionTestingAminoCodec = legacyAmino
 
-	eip712.SetEncodingConfig(encodingConfig)
+	// eip712.SetEncodingConfig(encodingConfig)
 
 	return encodingConfig
 }

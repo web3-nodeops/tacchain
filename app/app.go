@@ -13,6 +13,10 @@ import (
 	"path/filepath"
 	"sort"
 
+	// Force-load the tracer engines to trigger registration due to Go-Ethereum v1.10.15 changes
+	_ "github.com/cosmos/evm/x/vm/core/tracers/js"
+	_ "github.com/cosmos/evm/x/vm/core/tracers/native"
+
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -49,7 +53,6 @@ import (
 	"cosmossdk.io/client/v2/autocli"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/log"
-	"cosmossdk.io/simapp"
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/circuit"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
@@ -141,20 +144,16 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	mempool "github.com/cosmos/cosmos-sdk/types/mempool"
-	ethermintante "github.com/evmos/ethermint/app/ante"
-	ethermintsrvflags "github.com/evmos/ethermint/server/flags"
-	etherminttypes "github.com/evmos/ethermint/types"
-	"github.com/evmos/ethermint/x/evm"
-	evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
-	evmtypes "github.com/evmos/ethermint/x/evm/types"
-	"github.com/evmos/ethermint/x/evm/vm/geth"
-	"github.com/evmos/ethermint/x/feemarket"
-	feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
-	feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
-
-	// Force-load the tracer engines to trigger registration due to Go-Ethereum v1.10.15 changes
-	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
-	_ "github.com/ethereum/go-ethereum/eth/tracers/native"
+	// ethermintante "github.com/evmos/ethermint/app/ante"
+	// ethermintsrvflags "github.com/evmos/ethermint/server/flags"
+	// etherminttypes "github.com/evmos/ethermint/types"
+	// "github.com/evmos/ethermint/x/evm"
+	// evmkeeper "github.com/evmos/ethermint/x/evm/keeper"
+	// evmtypes "github.com/evmos/ethermint/x/evm/types"
+	// "github.com/evmos/ethermint/x/evm/vm/geth"
+	// "github.com/evmos/ethermint/x/feemarket"
+	// feemarketkeeper "github.com/evmos/ethermint/x/feemarket/keeper"
+	// feemarkettypes "github.com/evmos/ethermint/x/feemarket/types"
 )
 
 // module account permissions
@@ -171,7 +170,7 @@ var maccPerms = map[string][]string{
 	ibcfeetypes.ModuleName:      nil,
 	icatypes.ModuleName:         nil,
 	wasmtypes.ModuleName:        {authtypes.Burner},
-	evmtypes.ModuleName:         {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+	// evmtypes.ModuleName:         {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
 }
 
 var (
@@ -237,8 +236,8 @@ type TacChainApp struct {
 	configurator module.Configurator
 
 	// Ethermint keepers
-	EvmKeeper       *evmkeeper.Keeper
-	FeeMarketKeeper feemarketkeeper.Keeper
+	// EvmKeeper       *evmkeeper.Keeper
+	// FeeMarketKeeper feemarketkeeper.Keeper
 }
 
 // NewTacChainApp returns a reference to an initialized TacChainApp.
@@ -288,12 +287,7 @@ func NewTacChainApp(
 	// }
 	// baseAppOptions = append(baseAppOptions, voteExtOp)
 
-	// create and set dummy vote extension handler
-	voteExtOp := func(bApp *baseapp.BaseApp) {
-		voteExtHandler := simapp.NewVoteExtensionHandler()
-		voteExtHandler.SetHandlers(bApp)
-	}
-	baseAppOptions = append(baseAppOptions, voteExtOp, baseapp.SetOptimisticExecution())
+	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
 	// NOTE we use custom transaction decoder that supports the sdk.Tx interface instead of sdk.StdTx
 	// Setup Mempool and Proposal Handlers
@@ -322,10 +316,11 @@ func NewTacChainApp(
 		wasmtypes.StoreKey, icahosttypes.StoreKey,
 		icacontrollertypes.StoreKey,
 		// ethermint keys
-		evmtypes.StoreKey, feemarkettypes.StoreKey,
+		// evmtypes.StoreKey, feemarkettypes.StoreKey,
 	)
 
-	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
+	// tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey, feemarkettypes.TransientKey)
+	tkeys := storetypes.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := storetypes.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	// register streaming services
@@ -379,7 +374,9 @@ func NewTacChainApp(
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		encodingConfig.Codec,
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
-		etherminttypes.ProtoAccount,
+		// etherminttypes.ProtoAccount,
+		authtypes.ProtoBaseAccount,
+
 		maccPerms,
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32AccountAddrPrefix()),
 		sdk.GetConfig().GetBech32AccountAddrPrefix(),
@@ -621,7 +618,7 @@ func NewTacChainApp(
 	)
 
 	wasmDir := filepath.Join(homePath, "wasm")
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	wasmConfig, err := wasm.ReadNodeConfig(appOpts)
 	if err != nil {
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
@@ -644,6 +641,7 @@ func NewTacChainApp(
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
+		wasmtypes.VMConfig{},
 		wasmkeeper.BuiltInCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
@@ -694,20 +692,20 @@ func NewTacChainApp(
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// Create Ethermint keepers
-	feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
-	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
-		encodingConfig.Codec, authtypes.NewModuleAddress(govtypes.ModuleName),
-		runtime.NewKVStoreService(keys[feemarkettypes.StoreKey]), tkeys[feemarkettypes.TransientKey], feeMarketSs,
-	)
+	// feeMarketSs := app.GetSubspace(feemarkettypes.ModuleName)
+	// app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
+	// 	encodingConfig.Codec, authtypes.NewModuleAddress(govtypes.ModuleName),
+	// 	runtime.NewKVStoreService(keys[feemarkettypes.StoreKey]), tkeys[feemarkettypes.TransientKey], feeMarketSs,
+	// )
 
-	// Set authority to x/gov module account to only expect the module account to update params
-	tracer := cast.ToString(appOpts.Get(ethermintsrvflags.EVMTracer))
-	evmSs := app.GetSubspace(evmtypes.ModuleName)
-	app.EvmKeeper = evmkeeper.NewKeeper(
-		encodingConfig.Codec, runtime.NewKVStoreService(keys[evmtypes.StoreKey]), tkeys[evmtypes.TransientKey], authtypes.NewModuleAddress(govtypes.ModuleName),
-		app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
-		nil, geth.NewEVM, tracer, evmSs,
-	)
+	// // Set authority to x/gov module account to only expect the module account to update params
+	// tracer := cast.ToString(appOpts.Get(ethermintsrvflags.EVMTracer))
+	// evmSs := app.GetSubspace(evmtypes.ModuleName)
+	// app.EvmKeeper = evmkeeper.NewKeeper(
+	// 	encodingConfig.Codec, runtime.NewKVStoreService(keys[evmtypes.StoreKey]), tkeys[evmtypes.TransientKey], authtypes.NewModuleAddress(govtypes.ModuleName),
+	// 	app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
+	// 	nil, geth.NewEVM, tracer, evmSs,
+	// )
 
 	/****  Module Options ****/
 
@@ -752,8 +750,8 @@ func NewTacChainApp(
 		// sdk
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
 		// Ethermint app modules
-		feemarket.NewAppModule(app.FeeMarketKeeper, feeMarketSs),
-		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
+		// feemarket.NewAppModule(app.FeeMarketKeeper, feeMarketSs),
+		// evm.NewAppModule(app.EvmKeeper, app.AccountKeeper, evmSs),
 	)
 
 	// BasicModuleManager defines the module BasicManager is in charge of setting up basic,
@@ -791,8 +789,8 @@ func NewTacChainApp(
 		ibcexported.ModuleName,
 
 		// Ethermint modules
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
+		// evmtypes.ModuleName,
+		// feemarkettypes.ModuleName,
 		evidencetypes.ModuleName,
 		authz.ModuleName,
 		// no-op modules
@@ -819,8 +817,8 @@ func NewTacChainApp(
 		govtypes.ModuleName,
 
 		// Ethermint modules
-		evmtypes.ModuleName,
-		feemarkettypes.ModuleName,
+		// evmtypes.ModuleName,
+		// feemarkettypes.ModuleName,
 
 		feegrant.ModuleName,
 		group.ModuleName,
@@ -875,10 +873,10 @@ func NewTacChainApp(
 
 		// Ethermint modules
 		// evm module denomination is used by the feemarket module, in AnteHandle
-		evmtypes.ModuleName,
+		// evmtypes.ModuleName,
 		// NOTE: feemarket need to be initialized before genutil module:
 		// gentx transactions use MinGasPriceDecorator.AnteHandle
-		feemarkettypes.ModuleName,
+		// feemarkettypes.ModuleName,
 
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
@@ -944,7 +942,8 @@ func NewTacChainApp(
 	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.setAnteHandler(txConfig, cast.ToUint64(appOpts.Get(ethermintsrvflags.EVMMaxTxGasWanted)), wasmConfig, keys[wasmtypes.StoreKey])
+	// app.setAnteHandler(txConfig, cast.ToUint64(appOpts.Get(ethermintsrvflags.EVMMaxTxGasWanted)), wasmConfig, keys[wasmtypes.StoreKey])
+	app.setAnteHandler(txConfig, 0, wasmConfig, keys[wasmtypes.StoreKey])
 
 	// must be before Loading version
 	// requires the snapshot store to be created and registered as a BaseAppOption
@@ -1057,27 +1056,27 @@ func (app *TacChainApp) fixValidatorsState(ctx sdk.Context) error {
 	return nil
 }
 
-func (app *TacChainApp) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wasmConfig wasmtypes.WasmConfig, txCounterStoreKey *storetypes.KVStoreKey) {
+func (app *TacChainApp) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wasmConfig wasmtypes.NodeConfig, txCounterStoreKey *storetypes.KVStoreKey) {
 	anteHandler, err := NewAnteHandler(HandlerOptions{
 		HandlerOptions: authante.HandlerOptions{
-			AccountKeeper:          app.AccountKeeper,
-			BankKeeper:             app.BankKeeper,
-			SignModeHandler:        txConfig.SignModeHandler(),
-			FeegrantKeeper:         app.FeeGrantKeeper,
-			SigGasConsumer:         ethermintante.DefaultSigVerificationGasConsumer,
-			ExtensionOptionChecker: etherminttypes.HasDynamicFeeExtensionOption,
-			TxFeeChecker:           ethermintante.NewDynamicFeeChecker(app.EvmKeeper),
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			SignModeHandler: txConfig.SignModeHandler(),
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			// SigGasConsumer:         ethermintante.DefaultSigVerificationGasConsumer,
+			// ExtensionOptionChecker: etherminttypes.HasDynamicFeeExtensionOption,
+			// TxFeeChecker:           ethermintante.NewDynamicFeeChecker(app.EvmKeeper),
 		},
 		IBCKeeper:             app.IBCKeeper,
 		WasmConfig:            &wasmConfig,
 		WasmKeeper:            &app.WasmKeeper,
 		TXCounterStoreService: runtime.NewKVStoreService(txCounterStoreKey),
 		CircuitKeeper:         &app.CircuitKeeper,
-		EvmKeeper:             app.EvmKeeper,
-		FeeMarketKeeper:       app.FeeMarketKeeper,
-		MaxTxGasWanted:        maxGasWanted,
+		// EvmKeeper:             app.EvmKeeper,
+		// FeeMarketKeeper:       app.FeeMarketKeeper,
+		MaxTxGasWanted: maxGasWanted,
 		DisabledAuthzMsgs: []string{
-			sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
+			// sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
 			sdk.MsgTypeURL(&vestingtypes.MsgCreateVestingAccount{}),
 			sdk.MsgTypeURL(&vestingtypes.MsgCreatePermanentLockedAccount{}),
 			sdk.MsgTypeURL(&vestingtypes.MsgCreatePeriodicVestingAccount{}),
@@ -1320,14 +1319,14 @@ func BlockedAddresses() map[string]bool {
 func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 
-	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())         //nolint: staticcheck
-	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())   //nolint: staticcheck
-	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())         //nolint: staticcheck
-	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())         //nolint: staticcheck
-	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())       //nolint: staticcheck
-	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(slashingtypes.ParamKeyTable()) //nolint: staticcheck
-	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())              //nolint: staticcheck
-	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())     //nolint: staticcheck
+	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())
+	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())
+	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())
+	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())
+	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())
+	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(slashingtypes.ParamKeyTable())
+	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())
+	paramsKeeper.Subspace(crisistypes.ModuleName).WithKeyTable(crisistypes.ParamKeyTable())
 
 	ibcconnectionKeyTable := ibcclienttypes.ParamKeyTable()
 	ibcconnectionKeyTable.RegisterParamSet(&ibcconnectiontypes.Params{})
@@ -1336,11 +1335,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName).WithKeyTable(ibctransfertypes.ParamKeyTable())
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName).WithKeyTable(icacontrollertypes.ParamKeyTable())
 	paramsKeeper.Subspace(icahosttypes.SubModuleName).WithKeyTable(icahosttypes.ParamKeyTable())
-	paramsKeeper.Subspace(wasmtypes.ModuleName).WithKeyTable(wasmmigrationv2.ParamKeyTable()) //nolint: staticcheck
+	paramsKeeper.Subspace(wasmtypes.ModuleName).WithKeyTable(wasmmigrationv2.ParamKeyTable())
 
 	// ethermint subspaces
-	paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable()) //nolint:staticcheck
-	paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
+	// paramsKeeper.Subspace(evmtypes.ModuleName).WithKeyTable(evmtypes.ParamKeyTable())
+	// paramsKeeper.Subspace(feemarkettypes.ModuleName).WithKeyTable(feemarkettypes.ParamKeyTable())
 
 	paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 

@@ -24,7 +24,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	ethermintdebug "github.com/evmos/ethermint/client/debug"
+
+	// ethermintdebug "github.com/evmos/ethermint/client/debug"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -37,7 +38,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
+	// banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
@@ -47,10 +49,9 @@ import (
 	wasmcli "github.com/CosmWasm/wasmd/x/wasm/client/cli"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
-	ethermintclient "github.com/evmos/ethermint/client"
-	ethermintserver "github.com/evmos/ethermint/server"
-	ethermintserverconfig "github.com/evmos/ethermint/server/config"
+	// ethermintclient "github.com/evmos/ethermint/client"
+	// ethermintserver "github.com/evmos/ethermint/server"
+	// ethermintserverconfig "github.com/evmos/ethermint/server/config"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -73,12 +74,12 @@ func initAppConfig() (string, interface{}) {
 	type CustomAppConfig struct {
 		serverconfig.Config
 
-		Wasm wasmtypes.WasmConfig `mapstructure:"wasm"`
+		Wasm wasmtypes.NodeConfig `mapstructure:"wasm"`
 
 		// Ethermint config
-		EVM     ethermintserverconfig.EVMConfig     `mapstructure:"evm"`
-		JSONRPC ethermintserverconfig.JSONRPCConfig `mapstructure:"json-rpc"`
-		TLS     ethermintserverconfig.TLSConfig     `mapstructure:"tls"`
+		// EVM     ethermintserverconfig.EVMConfig     `mapstructure:"evm"`
+		// JSONRPC ethermintserverconfig.JSONRPCConfig `mapstructure:"json-rpc"`
+		// TLS     ethermintserverconfig.TLSConfig     `mapstructure:"tls"`
 	}
 
 	// Optionally allow the chain developer to overwrite the SDK's default
@@ -101,16 +102,17 @@ func initAppConfig() (string, interface{}) {
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
 	customAppConfig := CustomAppConfig{
-		Config:  *srvCfg,
-		Wasm:    wasmtypes.DefaultWasmConfig(),
-		EVM:     *ethermintserverconfig.DefaultEVMConfig(),
-		JSONRPC: *ethermintserverconfig.DefaultJSONRPCConfig(),
-		TLS:     *ethermintserverconfig.DefaultTLSConfig(),
+		Config: *srvCfg,
+		Wasm:   wasmtypes.DefaultNodeConfig(),
+		// EVM:     *ethermintserverconfig.DefaultEVMConfig(),
+		// JSONRPC: *ethermintserverconfig.DefaultJSONRPCConfig(),
+		// TLS:     *ethermintserverconfig.DefaultTLSConfig(),
 	}
 
 	customAppTemplate := serverconfig.DefaultConfigTemplate +
-		wasmtypes.DefaultConfigTemplate() +
-		ethermintserverconfig.DefaultConfigTemplate
+		wasmtypes.DefaultConfigTemplate()
+		// wasmtypes.DefaultConfigTemplate() +
+		// ethermintserverconfig.DefaultConfigTemplate
 
 	return customAppTemplate, customAppConfig
 }
@@ -126,12 +128,12 @@ func initRootCmd(
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		ethermintclient.ValidateChainID(
-			genutilcli.InitCmd(appInstance.BasicModuleManager, app.DefaultNodeHome),
-		),
+		// ethermintclient.ValidateChainID(
+		// 	genutilcli.InitCmd(appInstance.BasicModuleManager, app.DefaultNodeHome),
+		// ),
 		cmtcli.NewCompletionCmd(rootCmd, true),
-		NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
-		ethermintdebug.Cmd(),
+		// NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
+		// ethermintdebug.Cmd(),
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
@@ -139,7 +141,7 @@ func initRootCmd(
 
 	wasmcli.ExtendUnsafeResetAllCmd(rootCmd)
 
-	ethermintserver.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	// ethermintserver.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, genesis, and tx child commands
 	rootCmd.AddCommand(
@@ -147,7 +149,7 @@ func initRootCmd(
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		ethermintclient.KeyCommands(app.DefaultNodeHome),
+		// ethermintclient.KeyCommands(app.DefaultNodeHome),
 	)
 }
 
@@ -334,6 +336,6 @@ func tempDir() string {
 	if err != nil {
 		panic("failed to create temp dir: " + err.Error())
 	}
-	defer os.RemoveAll(dir)
+
 	return dir
 }
