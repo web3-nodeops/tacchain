@@ -43,6 +43,8 @@ make install
 
 ### 2. Initialize network folder
 
+In this example our node moniker will be `testnode`, don't forget to name your own node differently.
+
 ``` sh
 tacchaind init testnode --chain-id tacchain_2390-1 --home .testnet
 ```
@@ -116,7 +118,22 @@ make install
 
 ### 11. Start node
 
-Once your node has stopped at specified height, we need to update our binary. As of 18-Mar-2025 `v0.0.5` is the last version of `tacchaind`. Once we update the binary after block height `3192449`, we will be able to get to the last height, so this time we will start the node without `--halt-height` flag.
+This time we are not going to use `--halt-height` flag, instead we'll wait for our node to hit height `3408172`, at which we applied our next upgrade - `v0.0.6-testnet`. At the specified height, you should see a consensus error stating that you need to upgrade your binary version.
+
+``` shell
+tacchaind start --chain-id tacchain_2390-1 --home .testnet
+```
+
+### 12. Upgrade binary to [v0.0.6-testnet](https://github.com/TacBuild/tacchain/tree/v0.0.6-testnet)
+
+Once you get the error we mentioned above, you can stop your node and proceed with next update. In this version bumped GETH to v1.13.15.
+
+``` shell
+git checkout v0.0.6-testnet
+make install
+```
+
+### 13. Start node
 
 ``` shell
 tacchaind start --chain-id tacchain_2390-1 --home .testnet
@@ -142,6 +159,8 @@ tacchaind --home .testnet keys unsafe-import-eth-key validator <PRIVATE_KEY> --k
 
 1. Generate tx json file
 
+In this example our moniker is `testnode` as named when we initialized our node. Don't forget to replace with your node moniker.
+
 ``` sh
 echo "{\"pubkey\":$(tacchaind --home .testnet tendermint show-validator),\"amount\":\"1000000000utac\",\"moniker\":\"testnode\",\"identity\":null,\"website\":null,\"security\":null,\"details\":null,\"commission-rate\":\"0.1\",\"commission-max-rate\":\"0.2\",\"commission-max-change-rate\":\"0.01\",\"min-self-delegation\":\"1\"}" > validatortx.json
 ```
@@ -153,6 +172,8 @@ tacchaind --home .testnet tx staking create-validator validatortx.json --from va
 ```
 
 ### 4. Delegate more tokens (optional)
+
+In this example our moniker is `testnode` as named when we initialized our node. Don't forget to replace with your node moniker.
 
 ``` sh
 tacchaind --home .testnet tx staking delegate $(tacchaind --home .testnet q staking validators --output json | jq -r '.validators[] | select(.description.moniker == "testnode") | .operator_address') 1000000000utac --keyring-backend test --from validator -y
