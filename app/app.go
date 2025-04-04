@@ -708,13 +708,7 @@ func NewTacChainApp(
 	// Create Transfer Stack
 	var transferStack porttypes.IBCModule
 	transferStack = evmibctransfer.NewIBCModule(app.TransferKeeper)
-	transferStack = ibccallbacks.NewIBCMiddleware(transferStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
 	transferStack = erc20.NewIBCMiddleware(app.Erc20Keeper, transferStack)
-
-	transferICS4Wrapper := transferStack.(porttypes.ICS4Wrapper)
-	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IBCFeeKeeper)
-	// Since the callbacks middleware itself is an ics4wrapper, it needs to be passed to the ica controller keeper
-	app.TransferKeeper.WithICS4Wrapper(transferICS4Wrapper)
 
 	// Create static IBC router, add app routes, then set and seal it
 	ibcRouter := porttypes.NewRouter().
@@ -723,6 +717,24 @@ func NewTacChainApp(
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 	app.IBCKeeper.SetRouter(ibcRouter)
+
+	// NOTE: we are adding all available Cosmos EVM EVM extensions.
+	// Not all of them need to be enabled, which can be configured on a per-chain basis.
+	app.EVMKeeper.WithStaticPrecompiles(
+		evmd.NewAvailableStaticPrecompiles(
+			*app.StakingKeeper,
+			app.DistrKeeper,
+			app.BankKeeper,
+			app.Erc20Keeper,
+			app.AuthzKeeper,
+			app.TransferKeeper,
+			app.IBCKeeper.ChannelKeeper,
+			app.EVMKeeper,
+			app.GovKeeper,
+			app.SlashingKeeper,
+			app.EvidenceKeeper,
+		),
+	)
 
 	/****  Module Options ****/
 
@@ -814,6 +826,9 @@ func NewTacChainApp(
 		evmerc20types.ModuleName,
 		evmfeemarkettypes.ModuleName,
 		evmvmtypes.ModuleName, // NOTE: EVM BeginBlocker must come after FeeMarket BeginBlocker
+
+		evidencetypes.ModuleName,
+		authz.ModuleName,
 		// no-op modules
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -1030,7 +1045,6 @@ func NewTacChainApp(
 func (app *TacChainApp) setAnteHandler(txConfig client.TxConfig, maxGasWanted uint64, wasmConfig wasmtypes.NodeConfig, txCounterStoreKey *storetypes.KVStoreKey) {
 	anteHandler, err := NewAnteHandler(HandlerOptions{
 		HandlerOptions: authante.HandlerOptions{
-			AccountKeeper:          app.AccountKeeper,
 			BankKeeper:             app.BankKeeper,
 			SignModeHandler:        txConfig.SignModeHandler(),
 			FeegrantKeeper:         app.FeeGrantKeeper,
@@ -1038,6 +1052,7 @@ func (app *TacChainApp) setAnteHandler(txConfig client.TxConfig, maxGasWanted ui
 			ExtensionOptionChecker: evmcosmostypes.HasDynamicFeeExtensionOption,
 			TxFeeChecker:           evmcosmosante.NewDynamicFeeChecker(app.FeeMarketKeeper),
 		},
+		AccountKeeper:         app.AccountKeeper,
 		IBCKeeper:             app.IBCKeeper,
 		WasmConfig:            &wasmConfig,
 		WasmKeeper:            &app.WasmKeeper,
@@ -1163,15 +1178,22 @@ func (app *TacChainApp) AutoCliOpts() autocli.AppOptions {
 func (app *TacChainApp) DefaultGenesis() map[string]json.RawMessage {
 	genesis := app.BasicModuleManager.DefaultGenesis(app.appCodec)
 
-	mintGenState := evmd.NewMintGenesisState()
-	genesis[minttypes.ModuleName] = app.appCodec.MustMarshalJSON(mintGenState)
-
 	evmGenState := evmd.NewEVMGenesisState()
 	genesis[evmvmtypes.ModuleName] = app.appCodec.MustMarshalJSON(evmGenState)
 
 	// NOTE: for the example chain implementation we are also adding a default token pair,
 	// which is the base denomination of the chain (i.e. the WEVMOS contract)
-	erc20GenState := evmd.NewErc20GenesisState()
+	// TODO: test erc20 and refactor if needed, e.g. move contract addr to config, etc
+	utacERC20 := "0xD4949664cD82660AaE99bEdc034a0deA8A0bd517"
+	erc20GenState := evmerc20types.DefaultGenesisState()
+	erc20GenState.TokenPairs = []evmerc20types.TokenPair{
+		{
+			Erc20Address:  utacERC20,
+			Denom:         BaseDenom,
+			Enabled:       true,
+			ContractOwner: evmerc20types.OWNER_MODULE,
+		}}
+	erc20GenState.Params.NativePrecompiles = append(erc20GenState.Params.NativePrecompiles, utacERC20)
 	genesis[evmerc20types.ModuleName] = app.appCodec.MustMarshalJSON(erc20GenState)
 
 	return genesis

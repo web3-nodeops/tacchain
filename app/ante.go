@@ -17,10 +17,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	// vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	sdkvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
-
-	// bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -137,27 +134,6 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 		return anteHandler(ctx, tx, sim)
 	}, nil
-}
-
-func newEthAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
-	// evmAccountKeeper, ok := options.AccountKeeper.(evmtypes.AccountKeeper)
-	// if !ok {
-	// 	return nil, errors.New("account keeper does not implement evmtypes.AccountKeeper")
-	// }
-
-	return sdk.ChainAnteDecorators(
-	// ethermintante.NewEthSetUpContextDecorator(options.EvmKeeper),                         // outermost AnteDecorator. SetUpContext must be called first
-	// ethermintante.NewEthMempoolFeeDecorator(options.EvmKeeper),                           // Check eth effective gas price against minimal-gas-prices
-	// ethermintante.NewEthMinGasPriceDecorator(options.FeeMarketKeeper, options.EvmKeeper), // Check eth effective gas price against the global MinGasPrice
-	// ethermintante.NewEthValidateBasicDecorator(options.EvmKeeper),
-	// ethermintante.NewEthSigVerificationDecorator(options.EvmKeeper),
-	// ethermintante.NewEthAccountVerificationDecorator(evmAccountKeeper, options.EvmKeeper),
-	// ethermintante.NewCanTransferDecorator(options.EvmKeeper),
-	// ethermintante.NewEthGasConsumeDecorator(options.EvmKeeper, options.MaxTxGasWanted),
-	// ethermintante.NewEthIncrementSenderSequenceDecorator(evmAccountKeeper), // innermost AnteDecorator.
-	// ethermintante.NewGasWantedDecorator(options.EvmKeeper, options.FeeMarketKeeper),
-	// ethermintante.NewEthEmitEventDecorator(options.EvmKeeper), // emit eth tx hash and index at the very last ante handler.
-	), nil
 }
 
 func newCosmosAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
