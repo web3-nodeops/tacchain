@@ -58,7 +58,7 @@ wget http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.tar.lz4
 lz4 -dc < tac-turin-full-latest.tar.lz4 | tar -xvf -
 docker compose --env-file=.env.turin up -d
 ## Test
-curl -L localhost:55148 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0","method": "eth_blockNumber","params": [],"id": 1}'
+curl -L localhost:45138 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0","method": "eth_blockNumber","params": [],"id": 1}'
 ```
 
 ## Join Tac Turin Testnet - Full Guide
