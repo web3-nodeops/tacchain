@@ -28,7 +28,7 @@
 
 ### Quickstart
 
-#### Prerequisites
+#### Hardware
 
   - CPU: 8 cores
   - RAM: 16GB (rpc) / 32GB (validator)
