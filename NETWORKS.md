@@ -1,14 +1,16 @@
+
+http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.shasum
 # Tac Networks
 
 | Chain ID        | Type      | Status     | Version  | Notes         |
 |-----------------|-----------|------------|----------|---------------|
-| tacchain_2390-1 | `testnet` | **Active** | `v0.0.5` | Turin Testnet |
+| tacchain_2390-1 | `testnet` | **Active** | `v0.0.7-testnet` | Turin Testnet |
 
 ## Turin Testnet (`tacchain_2390-1`)
 
 | Chain ID                    | `tacchain_2390-1`                                                                             |
 |-----------------------------|-----------------------------------------------------------------------------------------------|
-| Tacchaind version           | `v0.0.5`                                                                                      |
+| Tacchaind version           | `v0.0.7-testnet`                                                                              |
 | RPC                         | <https://newyork-inap-72-251-230-233.ankr.com/tac_tacd_testnet_full_tendermint_rpc_1>         |
 | Genesis                     | <https://newyork-inap-72-251-230-233.ankr.com/tac_tacd_testnet_full_tendermint_rpc_1/genesis> |
 | gRPC                        | <https://newyork-inap-72-251-230-233.ankr.com/tac_tacd_testnet_full_tendermint_grpc_web_1>    |
@@ -21,7 +23,9 @@
 | Peer 1                      | f8124878e3526a9814c0a5f865820c5ea7eb26f8@72.251.230.233:45130                                 |
 | Peer 2                      | 4a03d6622a2ad923d79e81951fe651a17faf0be8@107.6.94.246:45130                                   |
 | Peer 3                      | ea5719fe6587b18ed0fee81f960e23c65c0e0ccc@206.217.210.164:45130                                |
-| Snapshots                   | TBD                                                                                           |
+| Snapshots                   |                                                                                               |
+| - full                      | <http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.tar.lz4>                            |
+| - archive                   | <http://snapshot.tac-turin.ankr.com/tac-turin-archive-latest.tar.lz4>                         |
 | Frontend                    | TBD                                                                                           |
 
 ## Join Tac Turin Testnet
@@ -33,6 +37,35 @@ This example guide connects to testnet. You can replace `chain-id`, `persistent_
   - [Go >= v1.21](https://go.dev/doc/install)
   - jq
   - curl
+  - lz4
+  - docker
+  - docker compose
+
+### Quickstart
+
+``` shell
+export TAC_HOME="~/.tacchain"
+export VERSION="v0.0.7-testnet"
+
+git clone https://github.com/TacBuild/tacchain.git && cd tacchain
+git checkout ${VERSION}
+docker build -t tacchain:${VERSION} .
+mkdir -p $TAC_HOME
+cp {networks/tacchain_2390-1/docker-compose.yaml,networks/tacchain_2390-1/.env.turin} $TAC_HOME/
+cd $TAC_HOME
+wget http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.tar.lz4
+lz4 -dc < tac-turin-full-latest.tar.lz4 | tar -xvf -
+docker compose --env-file=.env.turin up -d
+## Test
+curl -L localhost:55148 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0","method": "eth_blockNumber","params": [],"id": 1}'
+```
+
+### Prerequisites
+
+  - [Go >= v1.21](https://go.dev/doc/install)
+  - jq
+  - curl
+  - lz4
 
 ### 1. Install `tacchaind` [v0.0.1](https://github.com/TacBuild/tacchain/tree/v0.0.1)
 
@@ -107,12 +140,12 @@ We will repeat the same procedure and we need to stop our node once again at spe
 tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height 3192449
 ```
 
-### 10. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.5)
+### 10. Update binary to [v0.0.7-testnet](https://github.com/TacBuild/tacchain/tree/v0.0.7-testnet)
 
-In `v0.0.5` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
+In `v0.0.7-testnet` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
 
 ``` shell
-git checkout v0.0.5
+git checkout v0.0.7-testnet
 make install
 ```
 
