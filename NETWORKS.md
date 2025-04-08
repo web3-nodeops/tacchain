@@ -1,5 +1,3 @@
-
-http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.shasum
 # Tac Networks
 
 | Chain ID        | Type      | Status     | Version  | Notes         |
