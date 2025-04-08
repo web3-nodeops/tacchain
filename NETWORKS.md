@@ -51,7 +51,7 @@ git clone https://github.com/TacBuild/tacchain.git && cd tacchain
 git checkout ${VERSION}
 docker build -t tacchain:${VERSION} .
 mkdir -p $TAC_HOME
-cp {networks/tacchain_2390-1/docker-compose.yaml,networks/tacchain_2390-1/.env.turin} $TAC_HOME/
+cp networks/tacchain_2390-1/{docker-compose.yaml,.env.turin} $TAC_HOME/
 cd $TAC_HOME
 wget http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.tar.lz4
 lz4 -dc < tac-turin-full-latest.tar.lz4 | tar -xvf -
