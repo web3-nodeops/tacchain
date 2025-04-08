@@ -28,11 +28,9 @@ http://snapshot.tac-turin.ankr.com/tac-turin-full-latest.shasum
 | - archive                   | <http://snapshot.tac-turin.ankr.com/tac-turin-archive-latest.tar.lz4>                         |
 | Frontend                    | TBD                                                                                           |
 
-## Join Tac Turin Testnet
+### Quickstart
 
-This example guide connects to testnet. You can replace `chain-id`, `persistent_peers`, `timeout_commit`, `genesis url` with the network you want to join. `--home` flag specifies the path to be used. The example will create [.testnet](.testnet) folder.
-
-### Prerequisites
+#### Prerequisites
 
   - [Go >= v1.21](https://go.dev/doc/install)
   - jq
@@ -40,8 +38,6 @@ This example guide connects to testnet. You can replace `chain-id`, `persistent_
   - lz4
   - docker
   - docker compose
-
-### Quickstart
 
 ``` shell
 export TAC_HOME="~/.tacchain"
@@ -59,6 +55,10 @@ docker compose --env-file=.env.turin up -d
 ## Test
 curl -L localhost:55148 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0","method": "eth_blockNumber","params": [],"id": 1}'
 ```
+
+## Join Tac Turin Testnet - Full Guide
+
+This example guide connects to testnet. You can replace `chain-id`, `persistent_peers`, `timeout_commit`, `genesis url` with the network you want to join. `--home` flag specifies the path to be used. The example will create [.testnet](.testnet) folder.
 
 ### Prerequisites
 
