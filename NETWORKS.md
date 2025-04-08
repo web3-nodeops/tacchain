@@ -32,7 +32,7 @@
 
   - CPU: 8 cores
   - RAM: 16GB (rpc) / 32GB (validator)
-  - SSD: 500GB (nvme preferred)
+  - SSD: 500GB NVMe
 
 
 #### Prerequisites
