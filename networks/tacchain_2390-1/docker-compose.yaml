@@ -30,7 +30,7 @@ services:
       --db_dir=data
       --pruning=default
       --log_level=info
-      --p2p.persistent_peers="f8124878e3526a9814c0a5f865820c5ea7eb26f8@72.251.230.233:45130,4a03d6622a2ad923d79e81951fe651a17faf0be8@107.6.94.246:45130,ea5719fe6587b18ed0fee81f960e23c65c0e0ccc@206.217.210.164:45130"
+      --p2p.persistent_peers=${PERSISTENT_PEERS}
       --p2p.laddr=tcp://0.0.0.0:${P2P_PORT}
       --p2p.external-address=${EXT_IP}:${P2P_PORT}
       --rpc.laddr=tcp://0.0.0.0:${RPC_PORT}
