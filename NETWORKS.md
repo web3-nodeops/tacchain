@@ -30,6 +30,13 @@
 
 #### Prerequisites
 
+  - CPU: 8 cores
+  - RAM: 16GB (rpc) / 32GB (validator)
+  - SSD: 500GB (nvme preferred)
+
+
+#### Prerequisites
+
   - [Go >= v1.21](https://go.dev/doc/install)
   - jq
   - curl
