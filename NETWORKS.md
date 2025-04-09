@@ -147,12 +147,12 @@ We will repeat the same procedure and we need to stop our node once again at spe
 tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height 3192449
 ```
 
-### 10. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.7-testnet)
+### 10. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.5)
 
-In `v0.0.7-testnet` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
+In `v0.0.5` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
 
 ``` shell
-git checkout v0.0.7-testnet
+git checkout v0.0.5
 make install
 ```
 
