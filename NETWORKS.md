@@ -61,6 +61,9 @@ docker compose --env-file=.env.turin up -d
 curl -L localhost:45138 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0","method": "eth_blockNumber","params": [],"id": 1}'
 ```
 
+Assuming all is working you can now proceed from "Join as a validator”
+
+
 ## Join Tac Turin Testnet - Full Guide
 
 This example guide connects to testnet. You can replace `chain-id`, `persistent_peers`, `timeout_commit`, `genesis url` with the network you want to join. `--home` flag specifies the path to be used. The example will create [.testnet](.testnet) folder.
