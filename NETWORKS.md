@@ -70,7 +70,6 @@ This example guide connects to testnet. You can replace `chain-id`, `persistent_
   - [Go >= v1.21](https://go.dev/doc/install)
   - jq
   - curl
-  - lz4
 
 ### 1. Install `tacchaind` [v0.0.1](https://github.com/TacBuild/tacchain/tree/v0.0.1)
 
@@ -145,7 +144,7 @@ We will repeat the same procedure and we need to stop our node once again at spe
 tacchaind start --chain-id tacchain_2390-1 --home .testnet --halt-height 3192449
 ```
 
-### 10. Update binary to [v0.0.7-testnet](https://github.com/TacBuild/tacchain/tree/v0.0.7-testnet)
+### 10. Update binary to [v0.0.5](https://github.com/TacBuild/tacchain/tree/v0.0.7-testnet)
 
 In `v0.0.7-testnet` we introduced changes to `DefaultPowerReduction` variable and updated validators state, which is another breaking change.
 
