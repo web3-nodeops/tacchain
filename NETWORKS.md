@@ -26,7 +26,7 @@
 | - archive                   | <http://snapshot.tac-turin.ankr.com/tac-turin-archive-latest.tar.lz4>                         |
 | Frontend                    | TBD                                                                                           |
 
-#### Hardware
+#### Hardware Requirements
 
   - CPU: 8 cores
   - RAM: 16GB (rpc) / 32GB (validator)
