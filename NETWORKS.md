@@ -26,14 +26,13 @@
 | - archive                   | <http://snapshot.tac-turin.ankr.com/tac-turin-archive-latest.tar.lz4>                         |
 | Frontend                    | TBD                                                                                           |
 
-### Quickstart
-
 #### Hardware
 
   - CPU: 8 cores
   - RAM: 16GB (rpc) / 32GB (validator)
   - SSD: 500GB NVMe
 
+### Join Tac Turin Testnet Using Docker
 
 #### Prerequisites
 
@@ -64,7 +63,7 @@ curl -L localhost:45138 -H "Content-Type: application/json" -d '{"jsonrpc": "2.0
 Assuming all is working you can now proceed from "Join as a validator”
 
 
-## Join Tac Turin Testnet - Full Guide
+## Join Tac Turin Testnet Manually
 
 This example guide connects to testnet. You can replace `chain-id`, `persistent_peers`, `timeout_commit`, `genesis url` with the network you want to join. `--home` flag specifies the path to be used. The example will create [.testnet](.testnet) folder.
 
